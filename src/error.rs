@@ -9,7 +9,7 @@ use serde_json::json;
 pub enum HeaderError {
     #[error("Missing required header: `{0}`")]
     Missing(&'static str),
-    #[error("Invalid header value (not valid UTF-8): `{0}`")]
+    #[error("Invalid header value (not valid ASCII): `{0}`")]
     InvalidValue(&'static str),
     #[error("Failed to parse header value: `{0}`")]
     Parse(&'static str),
