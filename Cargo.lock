@@ -77,7 +77,7 @@ name = "axum-required-headers"
 version = "0.1.0"
 dependencies = [
  "axum",
- "axum-required-headers-macro",
+ "axum-required-headers-macros",
  "http",
  "http-body-util",
  "serde",
@@ -89,7 +89,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "axum-required-headers-macro"
+name = "axum-required-headers-macros"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",

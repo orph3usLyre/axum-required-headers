@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = { version = "0.8.8", features = ["macros"] }
-axum-required-headers-macro = { path = "./axum-required-headers-macro" }
+axum-required-headers-macros = { path = "./axum-required-headers-macros" }
 http = "1.4.0"
 serde_json = "1.0.149"
 thiserror = "2.0.18"

@@ -6,18 +6,17 @@ Ergonomic required and optional HTTP header extraction for [`axum`](https://gith
 
 - **Type-safe header extraction** with compile-time validation
 - **`Required<T>`** wrapper for headers that must be present (returns 400 Bad Request if missing)
-- **`Optional<T>`** wrapper for headers that may be absent (returns `None` if missing)
+- **`Optional<T>`** wrapper for headers that may be absent (populates with `None` if missing)
 - **`#[derive(Headers)]`** for extracting multiple headers into a single struct
 - Automatic JSON error responses with descriptive messages
 
-## Installation
+
+## Usage
 
 ```toml
 [dependencies]
 axum-required-headers = "0.1"
 ```
-
-## Usage
 
 ### Individual Header Types
 
