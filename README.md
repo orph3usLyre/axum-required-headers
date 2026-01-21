@@ -97,3 +97,8 @@ Missing or invalid headers return `400 Bad Request` with a JSON body:
 
 Error types: `missing_header`, `invalid_header_value` (non-ASCII), `header_parse_error`
 
+
+
+## License
+
+Dual-licensed under Apache 2.0 and MIT terms.
