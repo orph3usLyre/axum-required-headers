@@ -666,7 +666,7 @@ async fn test_required_deref() {
     let required = Required(header_value);
 
     // Deref should give us access to the inner value
-    let inner: &PositiveInt = &*required;
+    let inner: &PositiveInt = &required;
     assert_eq!(*inner, PositiveInt(42));
 
     // Can also access the inner struct's field through deref
@@ -689,7 +689,7 @@ async fn test_optional_deref_some() {
     let optional = Optional(Some(header_value));
 
     // Deref should give us access to the Option
-    let inner: &Option<PositiveInt> = &*optional;
+    let inner: &Option<PositiveInt> = &optional;
     assert!(inner.is_some());
     assert_eq!(inner.as_ref().unwrap().0, 42);
 }
@@ -699,7 +699,7 @@ async fn test_optional_deref_none() {
     let optional: Optional<PositiveInt> = Optional(None);
 
     // Deref should give us access to the None variant
-    let inner: &Option<PositiveInt> = &*optional;
+    let inner: &Option<PositiveInt> = &optional;
     assert!(inner.is_none());
 }
 
