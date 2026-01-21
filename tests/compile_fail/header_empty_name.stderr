@@ -1,0 +1,5 @@
+error: header name cannot be empty
+ --> tests/compile_fail/header_empty_name.rs:7:1
+  |
+7 | #[header("")]
+  | ^^^^^^^^^^^^^

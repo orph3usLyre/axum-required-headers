@@ -1,0 +1,5 @@
+error: Missing #[header("header-name")] attribute on field
+  --> tests/compile_fail/headers_field_missing_attribute.rs:11:5
+   |
+11 |     invalid_field: String,
+   |     ^^^^^^^^^^^^^^^^^^^^^

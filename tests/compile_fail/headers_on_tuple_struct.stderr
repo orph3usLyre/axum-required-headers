@@ -1,0 +1,5 @@
+error: Headers only supports named fields
+ --> tests/compile_fail/headers_on_tuple_struct.rs:6:8
+  |
+6 | struct TupleStruct(String, String);
+  |        ^^^^^^^^^^^

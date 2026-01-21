@@ -1,0 +1,5 @@
+error: Missing #[header("header-name")] attribute on struct
+ --> tests/compile_fail/header_missing_attribute.rs:7:1
+  |
+7 | struct MissingHeaderAttribute(String);
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
