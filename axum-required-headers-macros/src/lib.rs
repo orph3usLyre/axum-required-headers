@@ -168,14 +168,14 @@ fn derive_headers_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStre
     let field_constructions = field_names.iter().map(|name| quote! { #name });
 
     let expanded = quote! {
-        impl #impl_generics_with_s ::axum::extract::FromRequestParts<#s_ident>
+        impl #impl_generics_with_s ::axum_required_headers::axum::extract::FromRequestParts<#s_ident>
             for #name #ty_generics
             #where_clause_with_s
         {
             type Rejection = ::axum_required_headers::HeaderError;
 
             async fn from_request_parts(
-                parts: &mut ::http::request::Parts,
+                parts: &mut ::axum_required_headers::http::request::Parts,
                 _state: &#s_ident,
             ) -> ::std::result::Result<Self, Self::Rejection> {
                 #(#field_parsers)*
