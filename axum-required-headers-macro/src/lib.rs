@@ -2,28 +2,18 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, LitStr, parse_macro_input};
 
+const ATTRIBUTE_IDENT: &str = "header";
+
 /// Derive macro for individual header types.
 ///
 /// Automatically implements both `RequiredHeader` and `OptionalHeader`
 /// for a type, allowing it to be used with either `Required<T>` or `Optional<T>`.
 ///
 /// # Attributes
-///
 /// - `#[header("header-name")]` - Specifies the header name to extract
 ///
-/// # Examples
+/// See `axum-required-headers` for examples
 ///
-/// ```ignore
-/// #[derive(Header)]
-/// #[header("x-user-id")]
-/// struct UserId(String);
-///
-/// // Now you can use:
-/// async fn handler(
-///     Required(user_id): Required<UserId>,
-///     Optional(token): Optional<UserId>,
-/// ) { }
-/// ```
 #[proc_macro_derive(Header, attributes(header))]
 pub fn derive_header(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -38,21 +28,12 @@ pub fn derive_header(input: TokenStream) -> TokenStream {
 ///
 /// # Attributes
 ///
-/// - `#[header("header-name")]` - Marks a field as a required header
-/// - `#[header("header-name")]` - Option<T> - Marks a field as optional
+/// - `#[header("header-name")]` - Marks a field as a header
+/// - Fields with `Option<T>` are considered optional headers (will not error if not found in a
+/// handler)
 ///
-/// # Examples
+/// See `axum-required-headers` for examples
 ///
-/// ```ignore
-/// #[derive(Headers)]
-/// struct MyHeaders {
-///     #[header("x-user-id")]
-///     user_id: String,
-///
-///     #[header("x-tenant-id")]
-///     tenant_id: Option<String>,
-/// }
-/// ```
 #[proc_macro_derive(Headers, attributes(header))]
 pub fn derive_headers(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -63,9 +44,62 @@ pub fn derive_headers(input: TokenStream) -> TokenStream {
     }
 }
 
-fn derive_headers_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+fn derive_header_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let name = &input.ident;
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+
+    // Find the #[header("name")] attribute on the struct itself
+    let header_attr = input
+        .attrs
+        .iter()
+        .find(|attr| attr.path().is_ident(ATTRIBUTE_IDENT))
+        .ok_or_else(|| {
+            syn::Error::new_spanned(
+                &input,
+                "Missing #[header(\"header-name\")] attribute on struct",
+            )
+        })?;
+
+    let header_name = parse_header_attr(header_attr)?;
+
+    let expanded = quote! {
+        // Implement RequiredHeader
+        impl #impl_generics ::axum_required_headers::RequiredHeader for #name #ty_generics #where_clause {
+            const HEADER_NAME: &'static str = #header_name;
+        }
+
+        // Implement OptionalHeader
+        impl #impl_generics ::axum_required_headers::OptionalHeader for #name #ty_generics #where_clause {
+            const HEADER_NAME: &'static str = #header_name;
+        }
+    };
+
+    Ok(expanded)
+}
+
+fn derive_headers_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
+    let name = &input.ident;
+    let (_, ty_generics, where_clause) = input.generics.split_for_impl();
+
+    // build `impl<S, ...>` generics
+    let s_ident = syn::Ident::new("S", name.span());
+    let mut impl_generics_with_s = input.generics.clone();
+    impl_generics_with_s.params.insert(
+        0,
+        syn::GenericParam::Type(syn::TypeParam::from(s_ident.clone())),
+    );
+    let (impl_generics_with_s, _, _) = impl_generics_with_s.split_for_impl();
+
+    // extend where-clause with `S: Send + Sync`
+    let mut where_clause_with_s = where_clause.cloned();
+    {
+        let wc = where_clause_with_s.get_or_insert_with(|| syn::WhereClause {
+            where_token: Default::default(),
+            predicates: Default::default(),
+        });
+        wc.predicates
+            .push(syn::parse_quote!(#s_ident: ::std::marker::Send + ::std::marker::Sync));
+    }
 
     let Data::Struct(data) = &input.data else {
         return Err(syn::Error::new_spanned(
@@ -93,8 +127,13 @@ fn derive_headers_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStre
         let header_attr = field
             .attrs
             .iter()
-            .find(|attr| attr.path().is_ident("header"))
-            .ok_or_else(|| syn::Error::new_spanned(field, "Missing #[header(...)] attribute"))?;
+            .find(|attr| attr.path().is_ident(ATTRIBUTE_IDENT))
+            .ok_or_else(|| {
+                syn::Error::new_spanned(
+                    field,
+                    "Missing #[header(\"header-name\")] attribute on field",
+                )
+            })?;
 
         // Parse the attribute
         let header_name = parse_header_attr(header_attr)?;
@@ -129,12 +168,15 @@ fn derive_headers_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStre
     let field_constructions = field_names.iter().map(|name| quote! { #name });
 
     let expanded = quote! {
-        impl #impl_generics ::axum::extract::FromRequestParts<()> for #name #ty_generics #where_clause {
+        impl #impl_generics_with_s ::axum::extract::FromRequestParts<#s_ident>
+            for #name #ty_generics
+            #where_clause_with_s
+        {
             type Rejection = ::axum_required_headers::HeaderError;
 
             async fn from_request_parts(
                 parts: &mut ::http::request::Parts,
-                _state: &(),
+                _state: &#s_ident,
             ) -> ::std::result::Result<Self, Self::Rejection> {
                 #(#field_parsers)*
 
@@ -142,39 +184,6 @@ fn derive_headers_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStre
                     #(#field_constructions),*
                 })
             }
-        }
-    };
-
-    Ok(expanded)
-}
-
-fn derive_header_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
-    let name = &input.ident;
-    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
-
-    // Find the #[header("name")] attribute on the struct itself
-    let header_attr = input
-        .attrs
-        .iter()
-        .find(|attr| attr.path().is_ident("header"))
-        .ok_or_else(|| {
-            syn::Error::new_spanned(
-                &input,
-                "Missing #[header(\"header-name\")] attribute on struct",
-            )
-        })?;
-
-    let header_name = parse_header_attr(header_attr)?;
-
-    let expanded = quote! {
-        // Implement RequiredHeader
-        impl #impl_generics ::axum_required_headers::RequiredHeader for #name #ty_generics #where_clause {
-            const HEADER_NAME: &'static str = #header_name;
-        }
-
-        // Implement OptionalHeader
-        impl #impl_generics ::axum_required_headers::OptionalHeader for #name #ty_generics #where_clause {
-            const HEADER_NAME: &'static str = #header_name;
         }
     };
 

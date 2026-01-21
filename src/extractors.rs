@@ -33,8 +33,8 @@ pub trait OptionalHeader: std::str::FromStr + Send {
 ///
 /// # Examples
 ///
-/// ```ignore
-/// use axum_headers::Required;
+/// ```
+/// use axum_required_headers::{Required, RequiredHeader};
 ///
 /// struct UserId(String);
 ///
@@ -77,8 +77,8 @@ impl<T> DerefMut for Required<T> {
 ///
 /// # Examples
 ///
-/// ```ignore
-/// use axum_headers::Optional;
+/// ```
+/// use axum_required_headers::{Optional, OptionalHeader};
 ///
 /// struct TenantId(String);
 ///
@@ -120,8 +120,8 @@ impl<T> DerefMut for Optional<T> {
 /// Blanket implementation for `RequiredHeader` types via `Required<T>` wrapper.
 impl<S, T> FromRequestParts<S> for Required<T>
 where
-    T: RequiredHeader + Send + Sync + Sized,
-    <T as std::str::FromStr>::Err: std::error::Error + Send + 'static,
+    T: RequiredHeader,
+    <T as std::str::FromStr>::Err: std::error::Error,
     S: Send + Sync,
 {
     type Rejection = HeaderError;
@@ -145,8 +145,8 @@ where
 /// Blanket implementation for `OptionalHeader` types via `Optional<T>` wrapper.
 impl<S, T> FromRequestParts<S> for Optional<T>
 where
-    T: OptionalHeader + Sync,
-    <T as std::str::FromStr>::Err: std::error::Error + Send + 'static,
+    T: OptionalHeader,
+    <T as std::str::FromStr>::Err: std::error::Error,
     S: Send + Sync,
 {
     type Rejection = HeaderError;
