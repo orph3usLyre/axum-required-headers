@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum = { version = "0.8.8", features = ["macros"] }
+axum = { version = "0.8" }
 axum-required-headers-macros = { path = "./axum-required-headers-macros" }
-http = "1.4.0"
-serde_json = "1.0.149"
-thiserror = "2.0.18"
+http = "1"
+serde_json = "1"
+thiserror = "2"
 
 [dev-dependencies]
 http-body-util = "0.1.3"
