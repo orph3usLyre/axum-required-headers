@@ -1,6 +1,8 @@
 use proc_macro::TokenStream;
+use proc_macro_crate::FoundCrate;
+use proc_macro2::Span;
 use quote::quote;
-use syn::{Data, DeriveInput, Fields, LitStr, parse_macro_input};
+use syn::{Data, DeriveInput, Fields, Ident, LitStr, parse_macro_input};
 
 const ATTRIBUTE_IDENT: &str = "header";
 
@@ -166,16 +168,18 @@ fn derive_headers_impl(input: DeriveInput) -> syn::Result<proc_macro2::TokenStre
     }
 
     let field_constructions = field_names.iter().map(|name| quote! { #name });
+    let axum_crate = get_crate("axum")?;
+    let http_crate = get_crate("http")?;
 
     let expanded = quote! {
-        impl #impl_generics_with_s ::axum_required_headers::axum::extract::FromRequestParts<#s_ident>
+        impl #impl_generics_with_s ::#axum_crate::extract::FromRequestParts<#s_ident>
             for #name #ty_generics
             #where_clause_with_s
         {
             type Rejection = ::axum_required_headers::HeaderError;
 
             async fn from_request_parts(
-                parts: &mut ::axum_required_headers::http::request::Parts,
+                parts: &mut ::#http_crate::request::Parts,
                 _state: &#s_ident,
             ) -> ::std::result::Result<Self, Self::Rejection> {
                 #(#field_parsers)*
@@ -215,4 +219,22 @@ fn is_option_type(ty: &syn::Type) -> bool {
         }
         _ => false,
     }
+}
+
+fn get_crate(crate_name: &str) -> syn::Result<proc_macro2::TokenStream> {
+    let Ok(found_crate) = proc_macro_crate::crate_name(crate_name) else {
+        return Err(syn::Error::new(
+            Span::call_site(),
+            format!("Expected to find the '{crate_name}' dependency but none was found"),
+        ));
+    };
+
+    let tokens = match found_crate {
+        FoundCrate::Itself => quote!(crate),
+        FoundCrate::Name(name) => {
+            let ident = Ident::new(&name, Span::call_site());
+            quote!( #ident )
+        }
+    };
+    Ok(tokens)
 }
