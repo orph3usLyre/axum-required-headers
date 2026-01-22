@@ -3,6 +3,7 @@ name = "axum-required-headers"
 description = "Required (and optional) headers extension extractors for axum projects"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
 
 [dependencies]
 axum = { version = "0.8" }
