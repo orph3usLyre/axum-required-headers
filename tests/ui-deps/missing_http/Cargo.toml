@@ -12,3 +12,6 @@ path = "test.rs"
 axum-required-headers-macros = { path = "../../../axum-required-headers-macros" }
 axum = "0.8"
 # http is intentionally missing to test the error message
+
+[package.metadata.cargo-machete]
+ignored = ["axum"]
