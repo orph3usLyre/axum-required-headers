@@ -32,7 +32,7 @@ pub fn derive_header(input: TokenStream) -> TokenStream {
 ///
 /// - `#[header("header-name")]` - Marks a field as a header
 /// - Fields with `Option<T>` are considered optional headers (will not error if not found in a
-/// handler)
+///   handler)
 ///
 /// See `axum-required-headers` for examples
 ///
@@ -210,10 +210,10 @@ fn is_option_type(ty: &syn::Type) -> bool {
     match ty {
         syn::Type::Path(type_path) => {
             // Check if the last segment is "Option"
-            if let Some(last_segment) = type_path.path.segments.last() {
-                if last_segment.ident == "Option" {
-                    return true;
-                }
+            if let Some(last_segment) = type_path.path.segments.last()
+                && last_segment.ident == "Option"
+            {
+                return true;
             }
             false
         }
