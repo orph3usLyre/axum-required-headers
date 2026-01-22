@@ -7,7 +7,7 @@ license.workspace = true
 
 [dependencies]
 axum = { version = "0.8" }
-axum-required-headers-derive = { path = "../axum-required-headers-derive" }
+axum-required-headers-derive = "0.3.0"
 http = "1"
 serde_json = "1"
 thiserror = "2"

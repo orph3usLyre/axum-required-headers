@@ -65,7 +65,7 @@ name = "axum-required-headers"
 version = "0.3.0"
 dependencies = [
  "axum",
- "axum-required-headers-derive",
+ "axum-required-headers-derive 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "http",
  "http-body-util",
  "serde",
@@ -79,6 +79,18 @@ dependencies = [
 [[package]]
 name = "axum-required-headers-derive"
 version = "0.3.0"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "axum-required-headers-derive"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0c9969a987dfa69989c5360b2e377c39236cc1e78bb12dc747e89d22cc38371b"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
