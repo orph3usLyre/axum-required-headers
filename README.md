@@ -16,7 +16,11 @@ Ergonomic required and optional HTTP header extraction for [`axum`](https://gith
 ```toml
 [dependencies]
 axum-required-headers = "0.1"
+axum = "0.8"
+http = "1"
 ```
+
+> **Note:** Both `axum` and `http` must be listed as dependencies in your `Cargo.toml`. The `#[derive(Headers)]` macro generates code that references these crates directly.
 
 ### Individual Header Types
 
