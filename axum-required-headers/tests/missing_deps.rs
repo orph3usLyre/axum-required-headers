@@ -13,6 +13,7 @@ use std::process::Command;
 fn missing_axum_dependency() {
     let manifest_dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let test_dir = manifest_dir.join("tests/ui-deps/missing_axum");
+    dbg!(&test_dir);
 
     let output = Command::new("cargo")
         .arg("build")

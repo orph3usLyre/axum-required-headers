@@ -1,3 +1,5 @@
+[workspace]
+
 [package]
 name = "missing-http-test"
 version = "0.0.0"
@@ -9,7 +11,7 @@ name = "test"
 path = "test.rs"
 
 [dependencies]
-axum-required-headers-macros = { path = "../../../axum-required-headers-macros" }
+axum-required-headers-macros = { path = "../../../../axum-required-headers-macros" }
 axum = "0.8"
 # http is intentionally missing to test the error message
 
