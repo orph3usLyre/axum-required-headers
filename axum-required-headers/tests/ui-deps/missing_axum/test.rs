@@ -1,6 +1,6 @@
 //! Test that Headers derive fails when axum dependency is missing
 
-use axum_required_headers_macros::Headers;
+use axum_required_headers_derive::Headers;
 
 #[derive(Headers)]
 struct MyHeaders {

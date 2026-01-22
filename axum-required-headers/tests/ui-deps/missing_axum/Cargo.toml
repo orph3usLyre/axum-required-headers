@@ -11,7 +11,7 @@ name = "test"
 path = "test.rs"
 
 [dependencies]
-axum-required-headers-macros = { path = "../../../../axum-required-headers-macros" }
+axum-required-headers-derive = { path = "../../../../axum-required-headers-derive" }
 # axum is intentionally missing to test the error message
 http = "1"
 

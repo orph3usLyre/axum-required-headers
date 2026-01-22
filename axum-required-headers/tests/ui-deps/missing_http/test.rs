@@ -1,6 +1,6 @@
 //! Test that Headers derive fails when http dependency is missing
 
-use axum_required_headers_macros::Headers;
+use axum_required_headers_derive::Headers;
 
 #[derive(Headers)]
 struct MyHeaders {

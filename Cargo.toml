@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["axum-required-headers", "axum-required-headers-macros"]
+members = ["axum-required-headers", "axum-required-headers-derive"]
 
 [workspace.package]
 edition = "2024"

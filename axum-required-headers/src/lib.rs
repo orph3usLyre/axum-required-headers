@@ -58,7 +58,7 @@
 mod error;
 mod extractors;
 
-pub use axum_required_headers_macros::{Header, Headers};
+pub use axum_required_headers_derive::{Header, Headers};
 pub use error::HeaderError;
 pub use extractors::{Optional, OptionalHeader, Required, RequiredHeader};
 

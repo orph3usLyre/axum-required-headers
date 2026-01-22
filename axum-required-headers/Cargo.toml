@@ -1,11 +1,12 @@
 [package]
 name = "axum-required-headers"
+description = "Required (and optional) headers extension extractors for axum projects"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
 axum = { version = "0.8" }
-axum-required-headers-macros = { path = "../axum-required-headers-macros" }
+axum-required-headers-derive = { path = "../axum-required-headers-derive" }
 http = "1"
 serde_json = "1"
 thiserror = "2"

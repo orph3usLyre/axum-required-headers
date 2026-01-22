@@ -1,5 +1,5 @@
 [package]
-name = "axum-required-headers-macros"
+name = "axum-required-headers-derive"
 version.workspace = true
 edition.workspace = true
 
